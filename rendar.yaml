@@ -1,8 +1,6 @@
-```yaml
 services:
   - type: web
     name: music-backend
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
-```
