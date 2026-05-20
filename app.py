@@ -31,7 +31,7 @@ def download_audio():
     )
 
     ydl_opts = {
-        "format": "bestaudio/best",
+        "format": "bestaudio[ext=m4a]/bestaudio/best",
         "outtmpl": output_template,
         "quiet": True,
         "noplaylist": True,
