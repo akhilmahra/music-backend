@@ -26,9 +26,14 @@ def safe_extract(ydl, url, retries=3):
             print(f"Download attempt {i + 1}")
             return ydl.extract_info(url, download=True)
         except Exception as e:
-            last_error = e
-            print(f"Attempt {i + 1} failed: {e}")
-            time.sleep(1)
+            import traceback
+            print("FULL ERROR:")
+            traceback.print_exc()
+
+            return jsonify({
+                "error": str(e),
+                "type": str(type(e))
+            }), 500
 
     raise Exception(f"Download failed after retries: {last_error}")
 
