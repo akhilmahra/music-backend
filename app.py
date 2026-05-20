@@ -57,6 +57,8 @@ def download_audio():
         "quiet": True,
         "noplaylist": True,
 
+        "cookiefile": "cookies.txt",
+        
         # 🔥 stability settings
         "retries": 10,
         "fragment_retries": 10,
