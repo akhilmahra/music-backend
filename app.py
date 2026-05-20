@@ -6,15 +6,12 @@ import uuid
 app = Flask(__name__)
 
 DOWNLOAD_FOLDER = "downloads"
-
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
 
 @app.route("/")
 def home():
-    return {
-        "status": "Backend Running"
-    }
+    return {"status": "Backend Running"}
 
 
 @app.route("/download", methods=["POST"])
@@ -23,12 +20,9 @@ def download_audio():
     data = request.get_json()
 
     if not data or "url" not in data:
-        return jsonify({
-            "error": "No URL provided"
-        }), 400
+        return jsonify({"error": "No URL provided"}), 400
 
     video_url = data["url"]
-
     unique_id = str(uuid.uuid4())
 
     output_template = os.path.join(
@@ -38,10 +32,16 @@ def download_audio():
 
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": output_template,s
+        "outtmpl": output_template,
         "quiet": True,
-        "cookiefile": "cookies.txt",
         "noplaylist": True,
+
+        # safer fallback handling
+        "ignoreerrors": False,
+
+        # only use cookiefile if it exists
+        "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
+
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "m4a",
@@ -50,41 +50,31 @@ def download_audio():
     }
 
     try:
-
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-
-            info = ydl.extract_info(
-                video_url,
-                download=True
-            )
+            info = ydl.extract_info(video_url, download=True)
 
             title = info.get("title", "Unknown")
 
-        final_file = f"{DOWNLOAD_FOLDER}/{unique_id}.m4a"
+        # find actual file (DON'T assume extension)
+        file_path = None
+        for file in os.listdir(DOWNLOAD_FOLDER):
+            if file.startswith(unique_id):
+                file_path = os.path.join(DOWNLOAD_FOLDER, file)
+                break
 
-        if not os.path.exists(final_file):
-
-            return jsonify({
-                "error": "Audio conversion failed"
-            }), 500
+        if not file_path or not os.path.exists(file_path):
+            return jsonify({"error": "Audio conversion failed"}), 500
 
         return send_file(
-            final_file,
+            file_path,
             as_attachment=True,
             download_name=f"{title}.m4a",
             mimetype="audio/mp4"
         )
 
     except Exception as e:
-
-        return jsonify({
-            "error": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
-
-    app.run(
-        host="0.0.0.0",
-        port=5000
-    )
+    app.run(host="0.0.0.0", port=5000)
