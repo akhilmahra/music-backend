@@ -40,6 +40,7 @@ def download_audio():
         "format": "bestaudio/best",
         "outtmpl": output_template,s
         "quiet": True,
+        "cookiefile": "cookies.txt",
         "noplaylist": True,
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
