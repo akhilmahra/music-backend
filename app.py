@@ -51,7 +51,7 @@ def download_audio():
 
     ydl_opts = {
         # ✅ more stable format selection
-        "format": "bestaudio[ext=m4a]/bestaudio/best",
+        "format": "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best",
 
         "outtmpl": output_template,
         "quiet": True,
@@ -72,6 +72,8 @@ def download_audio():
                 "player_client": ["android", "web"]
             }
         },
+
+        "prefer_free_formats": True,
 
         "http_headers": {
             "User-Agent": "Mozilla/5.0"
