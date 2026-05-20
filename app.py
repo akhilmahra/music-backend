@@ -26,14 +26,9 @@ def safe_extract(ydl, url, retries=3):
             print(f"Download attempt {i + 1}")
             return ydl.extract_info(url, download=True)
         except Exception as e:
-            import traceback
-            print("FULL ERROR:")
-            traceback.print_exc()
-
-            return jsonify({
-                "error": str(e),
-                "type": str(type(e))
-            }), 500
+            last_error = e
+            print(f"Attempt {i + 1} failed: {e}")
+            time.sleep(1)
 
     raise Exception(f"Download failed after retries: {last_error}")
 
@@ -63,7 +58,7 @@ def download_audio():
         "noplaylist": True,
 
         "cookiefile": "cookies.txt",
-        
+
         # 🔥 stability settings
         "retries": 10,
         "fragment_retries": 10,
@@ -119,9 +114,14 @@ def download_audio():
         )
 
     except Exception as e:
-        print("ERROR:", e)
-        return jsonify({"error": str(e)}), 500
+        import traceback
+        print("FULL ERROR:")
+        traceback.print_exc()
 
+        return jsonify({
+            "error": str(e),
+            "type": str(type(e))
+        }), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
