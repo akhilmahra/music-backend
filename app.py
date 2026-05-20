@@ -39,6 +39,7 @@ def download_audio():
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": output_template,
+        "cookiesfrombrowser": ("chrome",),
         "quiet": True,
         "noplaylist": True,
         "postprocessors": [{
